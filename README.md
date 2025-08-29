@@ -51,6 +51,14 @@ docker build  -t meson-ifx  --file Dockerfile-ifx .
 docker run --rm -i -t --volume $(dirname $(pwd)):/extern -w/extern meson-ifx:latest rebuild_IFX.sh
 ```
 
+and ifort
+
+```shell
+docker build  -t meson-ifort  --file Dockerfile-ifort .
+
+docker run --rm -i -t --volume $(dirname $(pwd))/meson-nested-modules:/extern -w/extern meson-ifort:latest rebuild_IFORT.sh
+```
+
 ### output IFX
 
 ```txt

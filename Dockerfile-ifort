@@ -1,0 +1,40 @@
+#
+#  https://hub.docker.com/r/intel/oneapi-hpckit
+#
+
+# cloosets available to IFORT 2021.10.0 20230609 
+
+FROM intel/oneapi-hpckit:2021.4-devel-ubuntu18.04
+
+#  against WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+# ARG DEBIAN_FRONTEND=noninteractive
+
+
+## no update, because we dont wont to change the base image
+#  RUN    apt update \
+#   &&    apt install -y unzip wget git  vim nano mc 
+
+#          _ __ ___   ___  ___  ___  _ __  
+#         | '_ ` _ \ / _ \/ __|/ _ \| '_ \ 
+#         | | | | | |  __/\__ \ (_) | | | |
+#         |_| |_| |_|\___||___/\___/|_| |_|
+                      
+ARG MESON_VERSION=0.53.2
+ARG NINJA_VERSION=1.10.0
+
+ADD https://github.com/mesonbuild/meson/releases/download/${MESON_VERSION}/meson-${MESON_VERSION}.tar.gz     /tmp/meson.tar.gz
+ADD https://github.com/ninja-build/ninja/releases/download/v${NINJA_VERSION}/ninja-linux.zip                 /tmp/ninja-linux.zip
+
+### zip / unzip without APT
+ADD http://archive.ubuntu.com/ubuntu/pool/main/u/unzip/unzip_6.0-9ubuntu1.5_amd64.deb  /tmp/unzip.deb
+RUN dpkg -i /tmp/unzip.deb && rm /tmp/unzip.deb
+
+RUN  mkdir --parents /opt/meson  \
+    &&  tar xf /tmp/meson.tar.gz --strip-components=1 -C /opt/meson \
+    && chmod +x /opt/meson/meson.py \
+    && ln -s /opt/meson/meson.py /opt/meson/meson \
+    && unzip  /tmp/ninja-linux.zip -d /opt/meson \
+    && rm /tmp/meson.tar.gz   /tmp/ninja-linux.zip
+    
+ENV PATH="/opt/meson:$PATH"
+
